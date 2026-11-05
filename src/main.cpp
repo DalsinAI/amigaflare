@@ -64,6 +64,8 @@ public:
 #include "PlatformIPhoneOS.cpp"
 #elif __GCW0__
 #include "PlatformGCW0.cpp"
+#elif defined(__amigaos__)
+#include "PlatformAmiga.cpp"
 #elif __EMSCRIPTEN__
 #include "PlatformEmscripten.cpp"
 bool init_finished = false;
@@ -345,7 +347,14 @@ void EmscriptenMainLoop() {
 }
 #endif
 
+#ifdef __amigaos__
+extern "C" void amiga_start(void); // amiga/amiga_start.c
+#endif
+
 int main(int argc, char *argv[]) {
+#ifdef __amigaos__
+	amiga_start();
+#endif
 	settings = new Settings();
 
 	bool debug_event = false;

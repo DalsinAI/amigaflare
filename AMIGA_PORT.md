@@ -11,7 +11,7 @@ Base: tag v1.15 of both repositories (engine
 9c0e784ce8b0c8c41cca8c5b31c6cf6845269908, game
 2ef474f5f5f368628bc526f9e56f936dac743e49). Branch team2/flare-amiga.
 
-Status: first lab run (Instance-45, an emulated 68040 with an FPU, RTG,
+Status: two lab runs, NOT lab-passed yet. First lab run (Instance-45, an emulated 68040 with an FPU, RTG,
 5 November 2026): it opens a 640x480 screen, the first-start questions
 (language, mouse movement) and the title screen draw and answer the
 mouse, a new character is made, the intro plays, the first map
@@ -22,10 +22,19 @@ Workbench (the lock file's count back at 0). Known from that run:
 - Item pictures (images/loot/) did not load: "No signal bits
   available", 90 times. Flare loads pictures in threads by default,
   and each thread takes a signal bit. Threaded loading is now off by
-  default on the Amiga and not offered in the configuration menu; to be
-  checked in a second run.
-- The pause menu (Esc) is laid out wider than 640 pixels: its left
-  part is cut off. Its buttons on the right work.
+  default on the Amiga and not offered in the configuration menu; in
+  the second run there were no such errors.
+- The pause menu (Esc) was laid out wider than 640 pixels: the game
+  (fantasycore's engine/resolutions.txt) asks for 1280x720. OpenGPU's
+  SDL 2 opens its full screens at 640x480 whatever is asked for, so on
+  the Amiga Flare now opens a 1280x720 window on the Workbench by
+  default (full screen can still be chosen under Configuration).
+- Second run (5 November, windowed 1280x720): the title screen draws
+  whole. "Play Game" with a saved game stayed on "Loading..." for over
+  five minutes: SDL2.module's SDL_AtomicLock spinning (with
+  SDL_Delay), the audio thread (SDL_SDLAudioP2) busy, free memory
+  flat. To do: find the lock (the main task's stack) - most likely
+  SDL2_mixer/SDL audio, when the menu music changes.
 - images/menus/game_over.png is asked for but is not in the game's
   data (as upstream ships it): one error in flare_log.txt, harmless.
 
@@ -82,6 +91,9 @@ What was changed
   drawer's name; at exit, the screens SDL2.module 0.6 can leave after a
   full screen are closed (amiga/amiga_screens.c). amiga/stack.c: 512 KB
   of stack.
+- src/Settings.cpp: a 1280x720 window by default (fullscreen=0);
+  src/SDLHardwareRenderDevice.cpp asks for SDL_WINDOW_FULLSCREEN, not
+  _DESKTOP, when full screen is chosen.
 - src/Settings.cpp, src/PlatformAmiga.cpp: threaded picture loading is
   off by default and not offered (each loading thread takes a signal
   bit, and the task ran out of them).

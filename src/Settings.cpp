@@ -64,9 +64,21 @@ Settings::Settings()
 	, safe_video(false)
 {
 	config.resize(54);
+#ifdef __amigaos__
+	// OpenGPU's SDL 2 opens its full screens at 640x480, too small for the
+	// game's menus: a 1280x720 window on the Workbench instead
+	setConfigDefault(0,  "fullscreen",          &typeid(fullscreen),          "0",             &fullscreen,          "Fullscreen mode | 0 = disable, 1 = enable");
+#else
 	setConfigDefault(0,  "fullscreen",          &typeid(fullscreen),          "1",             &fullscreen,          "Fullscreen mode | 0 = disable, 1 = enable");
+#endif
+#ifdef __amigaos__
+	// Empyrean Campaign asks for 1280x720 (its menus are laid out for it)
+	setConfigDefault(1,  "resolution_w",        &typeid(screen_w),            "1280",          &screen_w,            "Window size");
+	setConfigDefault(2,  "resolution_h",        &typeid(screen_h),            "720",           &screen_h,            "");
+#else
 	setConfigDefault(1,  "resolution_w",        &typeid(screen_w),            "640",           &screen_w,            "Window size");
 	setConfigDefault(2,  "resolution_h",        &typeid(screen_h),            "480",           &screen_h,            "");
+#endif
 	setConfigDefault(3,  "music_volume",        &typeid(music_volume),        "96",            &music_volume,        "Music and sound volume | 0 = silent, 128 = maximum");
 	setConfigDefault(4,  "sound_volume",        &typeid(sound_volume),        "128",           &sound_volume,        "");
 	setConfigDefault(5,  "combat_text",         &typeid(combat_text),         "1",             &combat_text,         "Display floating damage text | 0 = disable, 1 = enable");

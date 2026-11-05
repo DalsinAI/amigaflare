@@ -1,0 +1,110 @@
+# Flare 1.15 (the engine) for AmigaOS 3.x, 68040/68060 + FPU, on OpenGPU's
+# SDL 2.
+#
+#   make -f amiga/Makefile.amigaos -j2 dist \
+#        STOVE=/path/to/openamigagcc-16.2.0-open4 \
+#        NDK=/path/to/OpenNDK/Include_H SDL2KIT=/path/to/opengpu-sdk \
+#        GAME=/path/to/flare-game
+#
+# STOVE is GFOpenAmigaGCC 16.2.0-open4 or later. SDL2KIT is the OpenGPU
+# developer kit: libSDL2.a, libSDL2_image.a, libSDL2_mixer.a and
+# libSDL2_ttf.a (the program's halves of LIBS:OpenGPU/SDL2.module,
+# SDL2_image.module, SDL2_mixer.module and SDL2_ttf.module). CMake is not
+# run: these are its sources, flags and definitions. src/Platform*.cpp are
+# included from src/main.cpp (src/PlatformAmiga.cpp here).
+# GAME is the flare-game repository at the same version (the game: its
+# mods/); 'dist' copies the engine's and the game's mods into the drawer
+# dist/Flare (+ dist/Flare.info).
+
+STOVE   ?= $(HOME)/CradleLab/toolchain/openamigagcc-16.2.0-open4-x86_64-linux
+NDK     ?= $(HOME)/CradleLab/gfopensdk/OpenNDK/Include_H
+SDL2KIT ?= /mnt/amigachrome/team2/deps/opengpu-sdk
+GAME    ?= /mnt/amigachrome/team2/deps/flare-game
+CC      = $(STOVE)/bin/m68k-amigaos-gcc
+CXX     = $(STOVE)/bin/m68k-amigaos-g++
+STRIP   = $(STOVE)/bin/m68k-amigaos-strip
+CPU     ?= -m68040 -m68881
+# -fno-tree-loop-distribute-patterns: GCC 16's loop miscompile (the kit's
+# sdl2-config gives it for GCC 16 too).
+OPT     ?= -O2 -fomit-frame-pointer -fno-tree-loop-distribute-patterns
+
+DEFS    = -D__amigaos__ -DNDEBUG
+INC     = -Isrc -I$(SDL2KIT)/include/SDL2
+CFLAGS  = -noixemul $(OPT) $(CPU) -fno-common -fno-math-errno $(DEFS)
+CXXFLAGS = $(CFLAGS) $(INC) -std=c++98 -fno-exceptions -Wall -Wno-psabi
+LDFLAGS = -noixemul $(CPU)
+LIBS    = -L$(SDL2KIT)/lib -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lSDL2 -lm
+
+BUILD   = build/amigaos
+OBJDIR  = $(BUILD)/obj
+PROG    = Flare
+OUT     = dist/Flare
+
+SRC     = $(filter-out src/Platform%.cpp,$(wildcard src/*.cpp))
+CSRC    = amiga/amiga_start.c amiga/amiga_screens.c amiga/stack.c \
+          amiga/pthread_stubs.c
+OBJS    = $(SRC:%.cpp=$(OBJDIR)/%.o) $(CSRC:%.c=$(OBJDIR)/%.o)
+HDRS    = $(wildcard src/*.h)
+ICONS   = $(wildcard amiga/icons/*.info)
+
+all: $(BUILD)/$(PROG)
+
+$(BUILD)/$(PROG): $(OBJS)
+	$(CXX) $(LDFLAGS) -o $@.debug $(OBJS) $(LIBS)
+	$(STRIP) -o $@ $@.debug
+
+# main.cpp includes the platform file
+$(OBJDIR)/src/main.o: src/PlatformAmiga.cpp
+
+$(OBJDIR)/%.o: %.cpp $(HDRS)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/amiga/%.o: amiga/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -I$(NDK) -Wall -Wextra -c -o $@ $<
+
+# The drawer: the program, the engine's mods/default, the game's
+# fantasycore and empyrean_campaign (what flare-game's CMakeLists.txt
+# installs), mods.txt, the licences and credits. 8-bit RGB PNGs are
+# rewritten as RGBA (amiga/tools/png_rgba.py: SDL2_image.module 0.6
+# damages the host's heap decoding some of them).
+GAMEMODS = fantasycore empyrean_campaign
+
+dist: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md
+	rm -rf $(OUT) && mkdir -p $(OUT)/mods
+	cp $(BUILD)/$(PROG) $(OUT)/
+	cp -R mods/default mods/mods.txt $(OUT)/mods/
+	for m in $(GAMEMODS); do cp -R $(GAME)/mods/$$m $(OUT)/mods/; done
+	python3 amiga/tools/png_rgba.py $(OUT)/mods
+	cp AMIGA_PORT.md $(OUT)/ReadMe
+	cp COPYING $(OUT)/COPYING.txt
+	cp $(GAME)/LICENSE.txt $(OUT)/LICENSE-data.txt
+	cp $(GAME)/CREDITS.txt $(OUT)/CREDITS-data.txt
+	cp CREDITS.engine.txt $(OUT)/CREDITS-engine.txt
+	cp amiga/icons/Flare.info amiga/icons/ReadMe.info $(OUT)/
+	for f in COPYING.txt LICENSE-data.txt CREDITS-data.txt CREDITS-engine.txt; do cp amiga/icons/ReadMe.info $(OUT)/$$f.info; done
+	cd $(OUT) && find . -mindepth 1 -type d | while read d; do cp $(CURDIR)/amiga/icons/Folder.info "$$d.info"; done
+	cp amiga/icons/Flare-drawer.info dist/Flare.info
+
+# The release drawer: the engine, its default mod, mods.txt and
+# GetTheGame (where to get flare-game's mods, which are not shipped).
+REL     = dist-release/Flare
+
+release: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md amiga/GetTheGame.txt
+	rm -rf dist-release && mkdir -p $(REL)/mods
+	cp $(BUILD)/$(PROG) $(REL)/
+	cp -R mods/default mods/mods.txt $(REL)/mods/
+	cp AMIGA_PORT.md $(REL)/ReadMe
+	cp amiga/GetTheGame.txt $(REL)/GetTheGame.txt
+	cp COPYING $(REL)/COPYING.txt
+	cp CREDITS.engine.txt $(REL)/CREDITS-engine.txt
+	cp amiga/icons/Flare.info amiga/icons/ReadMe.info $(REL)/
+	for f in GetTheGame.txt COPYING.txt CREDITS-engine.txt; do cp amiga/icons/ReadMe.info $(REL)/$$f.info; done
+	cd $(REL) && find . -mindepth 1 -type d | while read d; do cp $(CURDIR)/amiga/icons/Folder.info "$$d.info"; done
+	cp amiga/icons/Flare-drawer.info dist-release/Flare.info
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all clean dist release

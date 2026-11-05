@@ -64,9 +64,21 @@ Settings::Settings()
 	, safe_video(false)
 {
 	config.resize(54);
+#ifdef __amigaos__
+	// OpenGPU's SDL 2 opens its full screens at 640x480, too small for the
+	// game's menus: a 1280x720 window on the Workbench instead
+	setConfigDefault(0,  "fullscreen",          &typeid(fullscreen),          "0",             &fullscreen,          "Fullscreen mode | 0 = disable, 1 = enable");
+#else
 	setConfigDefault(0,  "fullscreen",          &typeid(fullscreen),          "1",             &fullscreen,          "Fullscreen mode | 0 = disable, 1 = enable");
+#endif
+#ifdef __amigaos__
+	// Empyrean Campaign asks for 1280x720 (its menus are laid out for it)
+	setConfigDefault(1,  "resolution_w",        &typeid(screen_w),            "1280",          &screen_w,            "Window size");
+	setConfigDefault(2,  "resolution_h",        &typeid(screen_h),            "720",           &screen_h,            "");
+#else
 	setConfigDefault(1,  "resolution_w",        &typeid(screen_w),            "640",           &screen_w,            "Window size");
 	setConfigDefault(2,  "resolution_h",        &typeid(screen_h),            "480",           &screen_h,            "");
+#endif
 	setConfigDefault(3,  "music_volume",        &typeid(music_volume),        "96",            &music_volume,        "Music and sound volume | 0 = silent, 128 = maximum");
 	setConfigDefault(4,  "sound_volume",        &typeid(sound_volume),        "128",           &sound_volume,        "");
 	setConfigDefault(5,  "combat_text",         &typeid(combat_text),         "1",             &combat_text,         "Display floating damage text | 0 = disable, 1 = enable");
@@ -114,7 +126,12 @@ Settings::Settings()
 	setConfigDefault(47, "dev_cmd_3",           &typeid(dev_cmd_3),           "toggle_hud",    &dev_cmd_3,           "Custom developer console shortcut command");
 	setConfigDefault(48, "auto_loot",           &typeid(auto_loot),           "1",             &auto_loot,           "Automatically pick up loot | 0 = disable, 1 = enable, 2 = currency only");
 	setConfigDefault(49, "joystick_rumble",     &typeid(joystick_rumble),     "1",             &joystick_rumble,     "Enables joystick rumble/vibrartion | 0 = disable, 1 = enable");
+#ifdef __amigaos__
+	// each loading thread needs a signal bit, and the task runs out of them
+	setConfigDefault(50, "enable_threaded_image_load",     &typeid(enable_threaded_image_load),     "0",             &enable_threaded_image_load,     "Enables multi-threaded image loading. Try disabling to reduce memory usage or fix instability.");
+#else
 	setConfigDefault(50, "enable_threaded_image_load",     &typeid(enable_threaded_image_load),     "1",             &enable_threaded_image_load,     "Enables multi-threaded image loading. Try disabling to reduce memory usage or fix instability.");
+#endif
 	setConfigDefault(51, "fade_walls",          &typeid(fade_walls),          "1",             &fade_walls,          "Lowers the opacity of walls that are covering the player. 0 = disable, 1 = enable");
 	setConfigDefault(52, "setup_language",      &typeid(setup_language),      "0",             &setup_language,      "(First-time-launch setup) Language | 0 = show dialog, 1 = no dialog");
 	setConfigDefault(53, "setup_mousemove",     &typeid(setup_mousemove),     "0",             &setup_mousemove,     "(First-time-launch setup) Mouse movement | 0 = show dialog, 1 = no dialog");

@@ -17,6 +17,14 @@ You should have received a copy of the GNU General Public License along with
 FLARE.  If not, see http://www.gnu.org/licenses/
 */
 
+#ifdef __amigaos__
+// OpenGPU's SDL 2 gives its 640x480 default as the desktop: open a screen
+// of the window's own size instead
+#define FLARE_FULLSCREEN SDL_WINDOW_FULLSCREEN
+#else
+#define FLARE_FULLSCREEN SDL_WINDOW_FULLSCREEN_DESKTOP
+#endif
+
 #include <SDL_image.h>
 
 #include <iostream>
@@ -317,7 +325,7 @@ int SDLHardwareRenderDevice::createContextInternal() {
 	int window_h = settings->screen_h;
 
 	if (settings->fullscreen) {
-		w_flags = w_flags | SDL_WINDOW_FULLSCREEN_DESKTOP;
+		w_flags = w_flags | FLARE_FULLSCREEN;
 
 		// make the window the same size as the desktop resolution
 		SDL_DisplayMode desktop;
@@ -720,7 +728,7 @@ void SDLHardwareRenderDevice::setFullscreen(bool enable_fullscreen) {
 				platform.setFullscreen(true);
 			}
 			else {
-				SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+				SDL_SetWindowFullscreen(window, FLARE_FULLSCREEN);
 			}
 			fullscreen = true;
 		}

@@ -114,7 +114,12 @@ Settings::Settings()
 	setConfigDefault(47, "dev_cmd_3",           &typeid(dev_cmd_3),           "toggle_hud",    &dev_cmd_3,           "Custom developer console shortcut command");
 	setConfigDefault(48, "auto_loot",           &typeid(auto_loot),           "1",             &auto_loot,           "Automatically pick up loot | 0 = disable, 1 = enable, 2 = currency only");
 	setConfigDefault(49, "joystick_rumble",     &typeid(joystick_rumble),     "1",             &joystick_rumble,     "Enables joystick rumble/vibrartion | 0 = disable, 1 = enable");
+#ifdef __amigaos__
+	// each loading thread needs a signal bit, and the task runs out of them
+	setConfigDefault(50, "enable_threaded_image_load",     &typeid(enable_threaded_image_load),     "0",             &enable_threaded_image_load,     "Enables multi-threaded image loading. Try disabling to reduce memory usage or fix instability.");
+#else
 	setConfigDefault(50, "enable_threaded_image_load",     &typeid(enable_threaded_image_load),     "1",             &enable_threaded_image_load,     "Enables multi-threaded image loading. Try disabling to reduce memory usage or fix instability.");
+#endif
 	setConfigDefault(51, "fade_walls",          &typeid(fade_walls),          "1",             &fade_walls,          "Lowers the opacity of walls that are covering the player. 0 = disable, 1 = enable");
 	setConfigDefault(52, "setup_language",      &typeid(setup_language),      "0",             &setup_language,      "(First-time-launch setup) Language | 0 = show dialog, 1 = no dialog");
 	setConfigDefault(53, "setup_mousemove",     &typeid(setup_mousemove),     "0",             &setup_mousemove,     "(First-time-launch setup) Mouse movement | 0 = show dialog, 1 = no dialog");

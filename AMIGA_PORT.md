@@ -11,7 +11,23 @@ Base: tag v1.15 of both repositories (engine
 9c0e784ce8b0c8c41cca8c5b31c6cf6845269908, game
 2ef474f5f5f368628bc526f9e56f936dac743e49). Branch team2/flare-amiga.
 
-Status: built, not yet run in the lab.
+Status: first lab run (Instance-45, an emulated 68040 with an FPU, RTG,
+5 November 2026): it opens a 640x480 screen, the first-start questions
+(language, mouse movement) and the title screen draw and answer the
+mouse, a new character is made, the intro plays, the first map
+("Arrival") loads in about a minute and a half, the hero walks where
+clicked, and Save & Exit then Exit Game save the game and return to the
+Workbench (the lock file's count back at 0). Known from that run:
+
+- Item pictures (images/loot/) did not load: "No signal bits
+  available", 90 times. Flare loads pictures in threads by default,
+  and each thread takes a signal bit. Threaded loading is now off by
+  default on the Amiga and not offered in the configuration menu; to be
+  checked in a second run.
+- The pause menu (Esc) is laid out wider than 640 pixels: its left
+  part is cut off. Its buttons on the right work.
+- images/menus/game_over.png is asked for but is not in the game's
+  data (as upstream ships it): one error in flare_log.txt, harmless.
 
 
 What you need
@@ -66,6 +82,9 @@ What was changed
   drawer's name; at exit, the screens SDL2.module 0.6 can leave after a
   full screen are closed (amiga/amiga_screens.c). amiga/stack.c: 512 KB
   of stack.
+- src/Settings.cpp, src/PlatformAmiga.cpp: threaded picture loading is
+  off by default and not offered (each loading thread takes a signal
+  bit, and the task ran out of them).
 - The game's 8-bit RGB PNGs are stored as RGBA in the drawer
   (amiga/tools/png_rgba.py): OpenGPU's SDL2_image.module 0.6 damages the
   host's heap decoding some of them.

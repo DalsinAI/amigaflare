@@ -58,6 +58,8 @@ Platform::Platform()
 	, config_input(Platform::Input::COUNT, true)
 	, config_misc(Platform::Misc::COUNT, true)
 {
+	// threads that load pictures run the task out of signal bits
+	config_video[Platform::Video::THREADED_IMAGE_LOAD] = false;
 }
 
 Platform::~Platform() {

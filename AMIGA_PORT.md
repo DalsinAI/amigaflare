@@ -47,8 +47,7 @@ Workbench (the lock file's count back at 0). Known from that run:
   config/flare_lock keeps a count of 1 and Flare then quits at once at
   every start: set the number in that file back to 0.
 - In a window, OpenGPU's SDL 2 reports the mouse about 16 pixels right
-  and 32 down of where the pointer is; Flare's own pointer shows where
-  a click will land.
+  and 32 down of where the pointer is (seen in the lab).
 - images/menus/game_over.png is asked for but is not in the game's
   data (as upstream ships it): one error in flare_log.txt, harmless.
 

@@ -1,0 +1,26 @@
+Flare: getting the game
+=======================
+
+This archive has the Flare engine for the Amiga and its default mod. The
+game itself, Empyrean Campaign (its maps, art, music and sounds, about
+610 MB), is not in it: get it from the Flare team, under its own licence
+(CC BY-SA 3.0).
+
+1. Download flare-game version 1.15, from
+   https://github.com/flareteam/flare-game/releases/tag/v1.15
+   (the "Source code" .zip or .tar.gz), on any computer.
+
+2. From its mods drawer, copy the two drawers
+
+       fantasycore
+       empyrean_campaign
+
+   into this drawer's mods drawer, next to "default". Keep mods/mods.txt
+   as it is: it lists them in that order.
+
+3. Double-click Flare.
+
+Without the game, Flare starts with its default mod only, which has no
+game to play.
+
+Version 1.15 matters: a newer or older game may not suit this engine.

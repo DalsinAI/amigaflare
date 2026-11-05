@@ -87,7 +87,24 @@ dist: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md
 	cd $(OUT) && find . -mindepth 1 -type d | while read d; do cp $(CURDIR)/amiga/icons/Folder.info "$$d.info"; done
 	cp amiga/icons/Flare-drawer.info dist/Flare.info
 
+# The release drawer: the engine, its default mod, mods.txt and
+# GetTheGame (where to get flare-game's mods, which are not shipped).
+REL     = dist-release/Flare
+
+release: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md amiga/GetTheGame.txt
+	rm -rf dist-release && mkdir -p $(REL)/mods
+	cp $(BUILD)/$(PROG) $(REL)/
+	cp -R mods/default mods/mods.txt $(REL)/mods/
+	cp AMIGA_PORT.md $(REL)/ReadMe
+	cp amiga/GetTheGame.txt $(REL)/GetTheGame.txt
+	cp COPYING $(REL)/COPYING.txt
+	cp CREDITS.engine.txt $(REL)/CREDITS-engine.txt
+	cp amiga/icons/Flare.info amiga/icons/ReadMe.info $(REL)/
+	for f in GetTheGame.txt COPYING.txt CREDITS-engine.txt; do cp amiga/icons/ReadMe.info $(REL)/$$f.info; done
+	cd $(REL) && find . -mindepth 1 -type d | while read d; do cp $(CURDIR)/amiga/icons/Folder.info "$$d.info"; done
+	cp amiga/icons/Flare-drawer.info dist-release/Flare.info
+
 clean:
 	rm -rf $(BUILD)
 
-.PHONY: all clean dist
+.PHONY: all clean dist release

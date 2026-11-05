@@ -11,7 +11,7 @@ Base: tag v1.15 of both repositories (engine
 9c0e784ce8b0c8c41cca8c5b31c6cf6845269908, game
 2ef474f5f5f368628bc526f9e56f936dac743e49). Branch team2/flare-amiga.
 
-Status: two lab runs, NOT lab-passed yet. First lab run (Instance-45, an emulated 68040 with an FPU, RTG,
+Status: lab-tested in a third run (below). First lab run (Instance-45, an emulated 68040 with an FPU, RTG,
 5 November 2026): it opens a 640x480 screen, the first-start questions
 (language, mouse movement) and the title screen draw and answer the
 mouse, a new character is made, the intro plays, the first map
@@ -33,8 +33,22 @@ Workbench (the lock file's count back at 0). Known from that run:
   whole. "Play Game" with a saved game stayed on "Loading..." for over
   five minutes: SDL2.module's SDL_AtomicLock spinning (with
   SDL_Delay), the audio thread (SDL_SDLAudioP2) busy, free memory
-  flat. To do: find the lock (the main task's stack) - most likely
-  SDL2_mixer/SDL audio, when the menu music changes.
+  flat.
+- Third run (5 November, the build now in the repository, fresh
+  settings): a 1280x720 window by default; the first-start questions,
+  the title, the saved-game screen, Load Game (about 100 seconds to the
+  first map), the hero on "Arrival" with the HUD and minimap whole, the
+  pause menu with all its tabs on screen, Save & Exit and Exit Game (the
+  lock count back at 0). No picture failed to load. The second run's
+  hang did not happen again; it came after the lab had been stopped with
+  Flare running, from settings written in a 640x480 full screen. If
+  Flare ever stops at "Loading...", that is the first thing to report.
+- If Flare is stopped from outside (a reset, or the lab stopped),
+  config/flare_lock keeps a count of 1 and Flare then quits at once at
+  every start: set the number in that file back to 0.
+- In a window, OpenGPU's SDL 2 reports the mouse about 16 pixels right
+  and 32 down of where the pointer is; Flare's own pointer shows where
+  a click will land.
 - images/menus/game_over.png is asked for but is not in the game's
   data (as upstream ships it): one error in flare_log.txt, harmless.
 

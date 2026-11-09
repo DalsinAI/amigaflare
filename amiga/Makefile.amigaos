@@ -84,7 +84,6 @@ dist: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md
 	cp CREDITS.engine.txt $(OUT)/CREDITS-engine.txt
 	cp amiga/icons/Flare.info amiga/icons/ReadMe.info $(OUT)/
 	for f in COPYING.txt LICENSE-data.txt CREDITS-data.txt CREDITS-engine.txt; do cp amiga/icons/ReadMe.info $(OUT)/$$f.info; done
-	cd $(OUT) && find . -mindepth 1 -type d | while read d; do cp $(CURDIR)/amiga/icons/Folder.info "$$d.info"; done
 	cp amiga/icons/Flare-drawer.info dist/Flare.info
 
 # The release drawer: the engine, its default mod, mods.txt and
@@ -101,7 +100,6 @@ release: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md amiga/GetTheGame.txt
 	cp CREDITS.engine.txt $(REL)/CREDITS-engine.txt
 	cp amiga/icons/Flare.info amiga/icons/ReadMe.info $(REL)/
 	for f in GetTheGame.txt COPYING.txt CREDITS-engine.txt; do cp amiga/icons/ReadMe.info $(REL)/$$f.info; done
-	cd $(REL) && find . -mindepth 1 -type d | while read d; do cp $(CURDIR)/amiga/icons/Folder.info "$$d.info"; done
 	cp amiga/icons/Flare-drawer.info dist-release/Flare.info
 
 clean:

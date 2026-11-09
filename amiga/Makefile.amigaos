@@ -78,6 +78,7 @@ dist: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md
 	for m in $(GAMEMODS); do cp -R $(GAME)/mods/$$m $(OUT)/mods/; done
 	python3 amiga/tools/png_rgba.py $(OUT)/mods
 	cp AMIGA_PORT.md $(OUT)/ReadMe
+	cp amiga/Controls $(OUT)/Controls
 	cp COPYING $(OUT)/COPYING.txt
 	cp $(GAME)/LICENSE.txt $(OUT)/LICENSE-data.txt
 	cp $(GAME)/CREDITS.txt $(OUT)/CREDITS-data.txt
@@ -95,6 +96,7 @@ release: $(BUILD)/$(PROG) $(ICONS) AMIGA_PORT.md amiga/GetTheGame.txt
 	cp $(BUILD)/$(PROG) $(REL)/
 	cp -R mods/default mods/mods.txt $(REL)/mods/
 	cp AMIGA_PORT.md $(REL)/ReadMe
+	cp amiga/Controls $(REL)/Controls
 	cp amiga/GetTheGame.txt $(REL)/GetTheGame.txt
 	cp COPYING $(REL)/COPYING.txt
 	cp CREDITS.engine.txt $(REL)/CREDITS-engine.txt
